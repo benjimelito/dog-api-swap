@@ -1,0 +1,28 @@
+name: Switch to Real API
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  transform:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if already using real API
+        id: check
+        run: |
+          if grep -rq 'const API_BASE' --include="*.ts" --include="*.tsx" .; then
+            echo "already_done=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Transform breeds.ts
+        if: steps.check.outputs.already_done != 'true'
+        run: node .github/scripts/use-real-api.js
+
+      - name: Commit changes
+        if: steps.check.outputs.already_done != 'true'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: switch to real API"
