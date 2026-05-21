@@ -13,13 +13,13 @@ jobs:
       - name: Check if already using real API
         id: check
         run: |
-          if grep -rq 'const API_BASE' --include="*.ts" --include="*.tsx" .; then
+          if ! grep -rq 'breedsData from "@/data/breeds.json"' --include="*.ts" --include="*.tsx" .; then
             echo "already_done=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Transform breeds.ts
         if: steps.check.outputs.already_done != 'true'
-        run: node .github/scripts/use-real-api.js
+        run: node .github/scripts/use-real-api.cjs
 
       - name: Commit changes
         if: steps.check.outputs.already_done != 'true'
